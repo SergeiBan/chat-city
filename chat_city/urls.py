@@ -1,10 +1,5 @@
 from django.contrib import admin
 from django.urls import path, include
-from spots import consumers
-
-websocket_urlpatterns = [
-    path(r'ws/', consumers.SpotConsumer.as_asgi()),
-]
 
 
 urlpatterns = [

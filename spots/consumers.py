@@ -1,30 +1,15 @@
-from djangochannelsrestframework.generics import GenericAsyncAPIConsumer
-from djangochannelsrestframework.mixins import (
-    ListModelMixin,
-    RetrieveModelMixin,
-    PatchModelMixin,
-    UpdateModelMixin,
-    CreateModelMixin,
-    DeleteModelMixin
-)
-from djangochannelsrestframework.decorators import action
-from spots.models import Spot
-from spots.serializers import SpotSerializer
+import json
+from channels.generic.websocket import WebsocketConsumer
 
 
-class SpotConsumer(
-    ListModelMixin,
-    RetrieveModelMixin,
-    PatchModelMixin,
-    UpdateModelMixin,
-    CreateModelMixin,
-    DeleteModelMixin,
-    GenericAsyncAPIConsumer
-):
-    queryset = Spot.objects.all()
-    serializer_class = SpotSerializer
+class ChatConsumer(WebsocketConsumer):
+    def connect(self):
+        self.accept()
 
-    @action()
-    def say(self, pk=None, **kwargs):
-        spot = self.get_object(pk=pk)
-        return {'answer': 'well well well'}, 200
+    def disconnect(self, code):
+        pass
+
+    def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        message = text_data_json['message']
+        self.send(text_data=json.dumps({"message": message}))
