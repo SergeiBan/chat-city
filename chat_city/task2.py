@@ -1,12 +1,15 @@
-# 75382602
+# 75523875
 import sys
 
 
-def get_input():
-	pushes = int(input()) * 2
+def get_score(pushes, game_field):
+	"""
+	Принимает строку  с числом нажатий игрока и список строк, представляющий
+	игровую карту. Возвращает число очков, полученных на данной карте.
+	"""
+	pushes = int(pushes) * 2
 	vals = {}
-	for i in range(4):
-		line = tuple(sys.stdin.readline().rstrip())
+	for line in game_field:
 		for val in line:
 			if val == '.':
 				continue
@@ -14,16 +17,17 @@ def get_input():
 				vals[val] = 1
 			else:
 				vals[val] += 1
-	return pushes, vals
-
-
-def get_score(pushes, vals):
 	score = 0
-	for k,v in vals.items():
+	for k, v in vals.items():
 		if pushes >= v:
 			score += 1
 	return score
 
 
-data = get_input()
-print(get_score(*data))
+if __name__ == '__main__':
+	pushes = input()
+	game_field = []
+	for i in range(4):
+		game_field.append(sys.stdin.readline().rstrip())
+	result = get_score(pushes, game_field)
+	print(result)
