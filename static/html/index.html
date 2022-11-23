@@ -10,20 +10,27 @@
     <script src="https://unpkg.com/vue-router@4">null</script>
   </head>
   <body>
-    <div id="app">
-  <div class="container">
+  <div class="container" id="app">
     
     <div class="row">
       <div class="col-md-6 offset-md-3">
-        <input v-model="spot" id="spot-name-input" type="text" size="100"><br>
-        <input @click.prevent_default="spotChange" id="room-name-submit" type="button" value="Enter">
-        {{ map }}
-        <textarea v-model="log" id="chat-log" cols="30" rows="3"></textarea><br>
-        <input v-model="message" id="chat-message-input" type="text" size="100"><br>
-        <input @click.prevent_default="sendMessage" id="chat-message-submit" type="button" value="Send">
+        <input v-model="spot" id="spot-name-input" type="text" size="100" class="form-control mb-2">
+        <input @click.prevent_default="spotChange" id="room-name-submit" type="button" value="Enter" class="btn btn-primary mb-4">
+        <textarea v-model="log" id="chat-log" cols="30" rows="3" class="form-control mb-2"></textarea>
+        <input v-model="message" id="chat-message-input" type="text" size="100" class="form-control mb-2">
+        <input @click.prevent_default="sendMessage" id="chat-message-submit" type="button" value="Send" class="btn btn-primary">
     </div>
-  </div> <!-- col-md-6 -->
-</div> <!-- row -->
+  </div>
+
+    <div class="row">
+      <div class="col">
+        <span @click="join0-0" id="0-0">---</span><span id="0-1">---</span><span id="0-2">---</span>
+      </div>
+      <div class="col">
+        <span id="1-0">---</span><span id="1-1">---</span><span id="1-2">---</span>
+      </div>
+    </div>
+
 </div> <!-- container -->
       
       <script type="module">
