@@ -6,10 +6,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://unpkg.com/vue@next">null</script>
-    <script src="https://unpkg.com/vue-router@4">null</script>
     <script src="https://api-maps.yandex.ru/2.1/?apikey=5f259035-cf56-42b4-8008-ba36c0b1526a&lang=ru_RU&load=Map"
       type="text/javascript"></script>
+    <script src="https://unpkg.com/vue@next">null</script>
+    <script src="https://unpkg.com/vue-router@4">null</script>
+    
   </head>
   <body>
   <div class="container" id="app">
@@ -32,37 +33,127 @@
   </div>
 
 </div> <!-- container -->
+
+
 <script type="text/javascript">
-  ymaps.ready(function () {
-    var myMap = new ymaps.Map("YMapsID", {
-      center: [55.76, 37.64],
-      zoom: 10
+  // ymaps.ready(function () {
+  //   var myMap = new ymaps.Map("YMapsID", {
+  //     center: [55.76, 37.64],
+  //     zoom: 10
+  //   },
+  //   {
+  //     yandexMapDisablePoiInteractivity: true
+  //   });
+  //   myMap.events.add('click', function(e) {
+  //     let coords = e.get('coords')
+  //     myMark = new ymaps.Placemark(coords, {
+  //           iconCaption: 'поиск...'
+  //       }, {
+  //           preset: 'islands#violetDotIconWithCaption',
+  //           draggable: true
+  //       });
+      
+  //       myMap.geoObjects.add(myPlacemark);
+  //   })
+  // });
+
+
+  ymaps.ready(init);
+
+function init() {
+    var myPlacemark,
+        myMap = new ymaps.Map('YMapsID', {
+            center: [55.753994, 37.622093],
+            zoom: 9
+        }, {
+            searchControlProvider: 'yandex#search'
+        });
+
+    // Слушаем клик на карте.
+    myMap.events.add('click', function (e) {
+        var coords = e.get('coords');
+
+        // Если метка уже создана – просто передвигаем ее.
+        if (myPlacemark) {
+            myPlacemark.geometry.setCoordinates(coords);
+        }
+        // Если нет – создаем.
+        else {
+            myPlacemark = createPlacemark(coords);
+            myMap.geoObjects.add(myPlacemark);
+            // Слушаем событие окончания перетаскивания на метке.
+            myPlacemark.events.add('dragend', function () {
+                getAddress(myPlacemark.geometry.getCoordinates());
+            });
+        }
+        getAddress(coords);
     });
-  });
+
+    // Создание метки.
+    function createPlacemark(coords) {
+        return new ymaps.Placemark(coords, {
+            iconCaption: 'поиск...'
+        }, {
+            preset: 'islands#violetDotIconWithCaption',
+            draggable: true
+        });
+    }
+
+    // Определяем адрес по координатам (обратное геокодирование).
+    function getAddress(coords) {
+        myPlacemark.properties.set('iconCaption', 'поиск...');
+        ymaps.geocode(coords).then(function (res) {
+            var firstGeoObject = res.geoObjects.get(0);
+
+            myPlacemark.properties
+                .set({
+                    // Формируем строку с данными об объекте.
+                    iconCaption: [
+                        // Название населенного пункта или вышестоящее административно-территориальное образование.
+                        firstGeoObject.getLocalities().length ? firstGeoObject.getLocalities() : firstGeoObject.getAdministrativeAreas(),
+                        // Получаем путь до топонима, если метод вернул null, запрашиваем наименование здания.
+                        firstGeoObject.getThoroughfare() || firstGeoObject.getPremise()
+                    ].filter(Boolean).join(', '),
+                    // В качестве контента балуна задаем строку с адресом объекта.
+                    balloonContent: firstGeoObject.getAddressLine()
+                });
+        });
+    }
+}
+
+
+
 </script>
       
       <script type="module">
         const app = Vue.createApp({
+
           data() {
             return {
               spot: '0',
               message: '',
               log: '',
               chatSocket: null,
-              map: '/media/Lake.png',
-              greeting: 'Click where you want to go'
+              map: '',
+              greeting: 'Click where you want to go',
+              ownMark: '',
+              coords: ''
             }
           },
+
           methods: {
             spotChange() {
-              //window.location.pathname = `${ this.spot }/`
               this.chatSocket.send(JSON.stringify({ 'spot': this.spot }))
             },
             sendMessage() {
               this.chatSocket.send(JSON.stringify({ 'message': this.message }))
               this.message = ''
+            },
+            placeMark(e) {
+              console.log(123)
             }
           },
+
           mounted() {
             this.chatSocket = new WebSocket(`ws://${window.location.host}/ws/${this.spot}/`)
             const temp_this = this
@@ -70,11 +161,8 @@
               temp_this.log += `${JSON.parse(e.data).message}\n` }
           }
         })
-
         app.mount('#app')
-
       </script>
-      
       
   </body>
 </html>

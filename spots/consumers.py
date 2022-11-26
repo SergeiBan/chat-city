@@ -28,6 +28,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
             )
             
             self.spot_name = text_data_json['spot']
+
+            print(self.spot_name)
             self.spot_group_name = "spot_%s" % self.spot_name
 
             await self.channel_layer.group_add(
