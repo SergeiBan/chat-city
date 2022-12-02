@@ -59,7 +59,6 @@
             this.message = ''
           },
           mapInit(){
-            var temp_this = this
             var myMap = new ymaps.Map("map", {
             center: this.coords,
             zoom: 10
@@ -75,11 +74,8 @@
                   draggable: true
               });
           myMark.events.add("dragend", function(e) {
-            temp_this.spot = myMark.geometry.getCoordinates()
-            let lon = Math.floor(temp_this.spot[0] * 10000)
-            let lat = Math.floor(temp_this.spot[1] * 10000)
-            temp_this.chatSocket.send(JSON.stringify({ 'spot': [lon.toString(),
-            lat.toString()] }))
+            this.spot = myMark.geometry.getCoordinates()
+            this.chatSocket.send(JSON.stringify({ 'spot': this.spot }))
           })
           myMap.geoObjects.add(myMark);
           this.myMap = myMap

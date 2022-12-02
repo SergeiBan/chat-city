@@ -64,9 +64,6 @@ WSGI_APPLICATION = 'chat_city.wsgi.application'
 ASGI_APPLICATION = 'chat_city.asgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -131,5 +128,13 @@ CHANNEL_LAYERS = {
         "CONFIG": {
             "hosts": [("127.0.0.1", 6379)]
         }
+    }
+}
+
+DJOSER = {
+    'LOGIN_FIELD': 'email',
+    'USER_CREATE_PASSWORD_RETYPE': True,
+    'SERIALIZERS': {
+        'user_create': 'users.serializers.CustomUserCreateSerializer'
     }
 }

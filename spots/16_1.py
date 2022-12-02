@@ -1,89 +1,101 @@
-# 77201164
+# 77476491
 import sys
 
 
+class FullDequeError(Exception):
+    pass
+
+
+class EmptyDequeError(Exception):
+    pass
+
+
 class MyDeque():
-	def __init__(self, max_size):
-		self.queue = [None] * max_size
-		self.max_size = max_size
-		self.size = 0
-		self.head = None
-		self.tail = None
+    def __init__(self, max_size):
+        self.__max_size = max_size
+        self.__queue = [None] * self.__max_size
+        self.__size = 0
+        self.__head = None
+        self.__tail = None
 
-	def pop_back(self):
-		if self.size == 0:
-			return 'error'
-		
-		num = self.queue[self.tail]
-		self.queue[self.tail] = None
+    def pop_back(self):
+        if self.__size == 0:
+            raise EmptyDequeError
 
-		if self.tail == 0:
-			self.tail = self.max_size - 1
-		else:
-			self.tail -= 1
+        num = self.__queue[self.__tail]
+        self.__queue[self.__tail] = None
 
-		self.size -= 1
-		return num
+        if self.__tail == 0:
+            self.__tail = self.__max_size - 1
+        else:
+            self.__tail -= 1
 
-	def pop_front(self):
-		if self.size == 0:
-			return 'error'
-			
-		num = self.queue[self.head]
+        self.__size -= 1
+        return num
 
-		self.queue[self.head] = None
-		self.head = (self.head + 1) % self.max_size
-		self.size -= 1
+    def pop_front(self):
+        if self.__size == 0:
+            raise EmptyDequeError
 
-		return num
+        num = self.__queue[self.__head]
 
-	def push_back(self, num):
-		if self.size == self.max_size:
-			print('error')
-			return
+        self.__queue[self.__head] = None
+        self.__head = (self.__head + 1) % self.__max_size
+        self.__size -= 1
 
-		if self.tail is None:
-			self.tail = 0
-		else:
-			self.tail = (self.tail + 1) % self.max_size
-		
-		if self.head is None:
-			self.head = self.tail
+        return num
 
-		self.queue[self.tail] = num
-		self.size += 1
+    def push_back(self, num):
+        if self.__size == self.__max_size:
+            raise FullDequeError
 
-	def push_front(self, num):
-		if self.size == self.max_size:
-			print('error')
-			return
+        if self.__tail is None:
+            self.__tail = 0
+        else:
+            self.__tail = (self.__tail + 1) % self.__max_size
 
-		if self.head is None:
-			self.head = 0
-		elif self.head == 0:
-			self.head = self.max_size - 1
-		else:
-			self.head -= 1
+        if self.__head is None:
+            self.__head = self.__tail
 
-		self.queue[self.head] = num
-		
-		if self.tail is None:
-			self.tail = self.head
-		self.size += 1
+        self.__queue[self.__tail] = num
+        self.__size += 1
+
+    def push_front(self, num):
+        if self.__size == self.__max_size:
+            raise FullDequeError
+
+        if self.__head is None:
+            self.__head = 0
+        elif self.__head == 0:
+            self.__head = self.__max_size - 1
+        else:
+            self.__head -= 1
+
+        self.__queue[self.__head] = num
+
+        if self.__tail is None:
+            self.__tail = self.__head
+        self.__size += 1
+
+
+def call_method(the_deque, command):
+    try:
+        if ' ' in command:
+            command, arg = command.split()
+            command = getattr(the_deque, command)
+            command(arg)
+            return
+        command = getattr(the_deque, command)
+        print(command())
+    except Exception:
+        print('error')
 
 
 if __name__ == '__main__':
-	com_num = int(input())
-	max_size = int(input())
-	
-	the_deque = MyDeque(max_size)
-	for com_idx in range(com_num):
-		command = sys.stdin.readline().rstrip()
-		if command == 'pop_back':
-			print(the_deque.pop_back())
-		elif command == 'pop_front':
-			print(the_deque.pop_front())
-		else:
-			comm, arg = command.split()
-			method = getattr(the_deque, comm)
-			method(arg)
+    com_num = int(input())
+    max_size = int(input())
+
+    the_deque = MyDeque(max_size)
+    for _ in range(com_num):
+        command = sys.stdin.readline().rstrip()
+        call_method(the_deque, command)
