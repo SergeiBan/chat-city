@@ -47,6 +47,9 @@
             greeting: 'Click where you want to go',
             myMark: '',
             coords: [55.76, 37.64],
+            zoom: 10,
+            lon: 0,
+            lat: 0
           }
         },
 
@@ -67,6 +70,11 @@
           {
             yandexMapDisablePoiInteractivity: true
           });
+          myMap.events.add('boundschange', function(e){
+            let newZ = e.get('newZoom')
+            let oldZ = e.get('oldZoom')
+            console.log(newZ, oldZ)
+          })
 
           var myMark = new ymaps.Placemark(this.coords, {
                   iconCaption: 'поиск...'
@@ -78,8 +86,13 @@
             temp_this.spot = myMark.geometry.getCoordinates()
             let lon = Math.floor(temp_this.spot[0] * 10000)
             let lat = Math.floor(temp_this.spot[1] * 10000)
-            temp_this.chatSocket.send(JSON.stringify({ 'spot': [lon.toString(),
-            lat.toString()] }))
+            if (lon == temp_this.log && lat == temp_this.lat)
+              { return }
+            temp_this.lon = lon
+            temp_this.lat = lat
+            temp_this.zoom = myMap.getZoom()
+            temp_this.chatSocket.send(JSON.stringify({ 'spot': [lon,
+            lat], 'zoom': temp_this.zoom }))
           })
           myMap.geoObjects.add(myMark);
           this.myMap = myMap

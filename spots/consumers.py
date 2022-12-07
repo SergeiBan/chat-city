@@ -1,13 +1,18 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 
+all_channels = {}
+
 
 class ChatConsumer(AsyncWebsocketConsumer):
+    PREVIOUS_SPOT = (0, 0)
     CURRENT_SPOT = '0'
+    CURRENT_ZOOM = 0
 
     async def connect(self):
         self.spot_name = self.scope["url_route"]["kwargs"]["spot_name"]
         self.spot_group_name = "spot_%s" % self.spot_name
+        self.zoom = self.CURRENT_ZOOM
 
         await self.channel_layer.group_add(
             self.spot_group_name, self.channel_name
@@ -26,12 +31,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.channel_layer.group_discard(
                 self.spot_group_name, self.channel_name
             )
-            
-            self.spot_name = text_data_json['spot']
-            print(self.spot_name)
 
-            self.spot_group_name = f'spot_{self.spot_name[0]}.{self.spot_name[1]}'
+            lon, lat = text_data_json['spot']
+            # if self.CURRENT_ZOOM >= 18:
+            all_channels[(lon, lat)] = self.channel_name
 
+            self.spot_group_name = str(lon) + str(lat)
             await self.channel_layer.group_add(
                 self.spot_group_name, self.channel_name
             )
@@ -45,4 +50,5 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def chat_message(self, event):
         message = event["message"]
+        print(all_channels)
         await self.send(text_data=json.dumps({"message": message}))
