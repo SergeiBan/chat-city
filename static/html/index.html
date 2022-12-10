@@ -84,15 +84,13 @@
               });
           myMark.events.add("dragend", function(e) {
             temp_this.spot = myMark.geometry.getCoordinates()
-            let lon = Math.floor(temp_this.spot[0] * 10000)
-            let lat = Math.floor(temp_this.spot[1] * 10000)
-            if (lon == temp_this.log && lat == temp_this.lat)
-              { return }
-            temp_this.lon = lon
-            temp_this.lat = lat
+            let lon = Math.floor(temp_this.spot[0] * 1000000)
+            let lat = Math.floor(temp_this.spot[1] * 1000000)
+            
+            temp_this.lon = temp_this.spot[0]
+            temp_this.lat = temp_this.spot[1]
             temp_this.zoom = myMap.getZoom()
-            temp_this.chatSocket.send(JSON.stringify({ 'spot': [lon,
-            lat], 'zoom': temp_this.zoom }))
+            temp_this.chatSocket.send(JSON.stringify({ 'spot': [lon, lat], 'zoom': temp_this.zoom }))
           })
           myMap.geoObjects.add(myMark);
           this.myMap = myMap
