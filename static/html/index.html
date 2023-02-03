@@ -14,7 +14,7 @@
   </head>
   <body>
   <div class="container" id="app">
-    
+
     <div class="row">
       <div class="col-md-6 offset-md-3">
         <input v-model="spot" id="spot-name-input" type="text" size="100" class="form-control mb-2">
@@ -84,8 +84,8 @@
               });
           myMark.events.add("dragend", function(e) {
             temp_this.spot = myMark.geometry.getCoordinates()
-            let lon = Math.floor(temp_this.spot[0] * 1000000)
-            let lat = Math.floor(temp_this.spot[1] * 1000000)
+            let lon = Math.floor(temp_this.spot[0] * 1000000000)
+            let lat = Math.floor(temp_this.spot[1] * 1000000000)
             
             temp_this.lon = temp_this.spot[0]
             temp_this.lat = temp_this.spot[1]
